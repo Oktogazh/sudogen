@@ -1,4 +1,5 @@
 import argparse
+from spylls.hunspell import Dictionary
 
 
 def load_dictionary() -> tuple[list[str], list[str]]:
@@ -7,25 +8,19 @@ def load_dictionary() -> tuple[list[str], list[str]]:
     the first array represents the lemma,
     the second the possible derived word types
     """
-    parser = argparse.ArgumentParser(
-        description="Load a file containing a list of words or a hunspell .dic file."
+    parser = argparse.ArgumentParser(description="Load a hunspell folder.")
+    parser.add_argument(
+        "dictionary_path",
+        nargs="?",
+        type=str,
+        help="Name of the directory, without the extentions .dic or .aff",
+        default="en_US",
     )
-    parser.add_argument("file_path", type=str, help="Path of the file:")
 
     args = parser.parse_args()
-    file_path = args.file_path
-    words = []
-    derived_words = []
-    if file_path.endswith(".dic"):
-        words = load_hunspell_dic(file_path)
-    else:
-        with open(file_path, "r") as file:
-            words = file.read().splitlines()
-
-    print(
-        f"loaded {len(words)} words and {len(derived_words)} derived words from {file_path}"
-    )
-    return words, derived_words
+    dictionary_path = args.dictionary_path
+    dictionary = Dictionary.from_files(dictionary_path)
+    return dictionary
 
 
 def load_hunspell_dic():
